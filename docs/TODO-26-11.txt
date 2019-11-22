@@ -1,0 +1,6 @@
+NO cal participar al Codalab, pero SI demostrar:
+
+-que s'ha pogut executar el codi base de la pràctica,
+-que s'ha creat un model neuronal diferent del que hi ha al codi base,
+-que s'ha mirat la llibreria pytorch per saber quines funcions utilitzar i quins paràmetres de la xarxa canviar, i
+-quins són els problemes i dubtes que hagin pogut sorgir 
