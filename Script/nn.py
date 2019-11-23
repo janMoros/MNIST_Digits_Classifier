@@ -249,7 +249,7 @@ for epoch in range(epochs):
         plt.show()
 
         plt.figure()
-        ax = sb.heatmap(confusionMatrix, cmap="Blues")
+        ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True)
         plt.show()
 
 display.clear_output(wait=True)
