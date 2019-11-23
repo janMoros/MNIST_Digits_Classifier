@@ -7,6 +7,7 @@ import random
 from sklearn.metrics import confusion_matrix
 from IPython import display
 import seaborn as sb
+import time
 
 # Load datasets
 train_data = np.load('../base_dades_xarxes_neurals/train.npy', allow_pickle=True)
@@ -15,7 +16,7 @@ val_data = np.load('../base_dades_xarxes_neurals/val.npy', allow_pickle=True)
 # Optimizaiton config
 target_class = 3  # Train a classifier for this class
 batch_size = 50  # Number of samples used to estimate the gradient (bigger = stable training & bigger learning rate)
-learning_rate = 0.05  # Optimizer learning rate
+learning_rate = 0.1  # Optimizer learning rate
 epochs = 25  # Number of iterations over the whole dataset.
 
 
@@ -215,41 +216,157 @@ def val(model, criterion):
     return epoch_loss, epoch_acc, confusionMatrix
 
 
-# Loop d'entrenament principal
-train_loss = []
-train_accuracy = []
-val_loss = []
-val_accuracy = []
+# Funció per evaluar el comportament del model en funció del learning rate
+def entrenamentMain():
+    # Loop d'entrenament principal
+    train_loss = []
+    train_accuracy = []
+    val_loss = []
+    val_accuracy = []
 
-# Remove this line out of jupyter notebooks
-for epoch in range(epochs):
-    t_loss, t_acc = train(model, optimizer, criterion)
+    # Remove this line out of jupyter notebooks
+    for epoch in range(epochs):
+        t_loss, t_acc = train(model, optimizer, criterion)
 
-    v_loss, v_acc, confusionMatrix = val(model, criterion)
-    print(confusionMatrix)
+        v_loss, v_acc, confusionMatrix = val(model, criterion)
+        print(confusionMatrix)
 
-    train_loss.append(t_loss)
-    train_accuracy.append(t_acc)
-    val_loss.append(v_loss)
-    val_accuracy.append(v_acc)
+        train_loss.append(t_loss)
+        train_accuracy.append(t_acc)
+        val_loss.append(v_loss)
+        val_accuracy.append(v_acc)
+
+        plt.subplot(1, 2, 1)
+        plt.title("loss")
+        plt.plot(train_loss, 'b-')
+        plt.plot(val_loss, 'r-')
+        plt.legend(["train", "val"])
+        plt.subplot(1, 2, 2)
+        plt.title("accuracy")
+        plt.plot(train_accuracy, 'b-')
+        plt.plot(val_accuracy, 'r-')
+        plt.legend(["train", "val"])
+        display.clear_output(wait=True)
+        display.display(plt.gcf())
+        if epoch == range(epochs)[-1]:
+            plt.show()
+
+            plt.figure()
+            ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True, fmt="d")
+            plt.show()
+
+    display.clear_output(wait=True)
+
+
+def learningRateTest():
+    learning_rates = [0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
+    train_loss = []
+    train_accuracy = []
+    val_loss = []
+    val_accuracy = []
+    exe_time = []
+
+    for lr in learning_rates:
+        t_ini = time.time()
+        optimizer = torch.optim.SGD(model.parameters(), lr)
+
+        # Remove this line out of jupyter notebooks
+        for epoch in range(epochs):
+            t_loss, t_acc = train(model, optimizer, criterion)
+            v_loss, v_acc, confusionMatrix = val(model, criterion)
+            #print(confusionMatrix)
+
+
+            if epoch == range(epochs)[-1]:
+                train_loss.append(t_loss)
+                train_accuracy.append(t_acc)
+                val_loss.append(v_loss)
+                val_accuracy.append(v_acc)
+
+                plt.figure()
+                plt.title("Heatmap with learning rate %s" % lr)
+                ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True, fmt="d")
+                plt.show()
+
+        exe_time.append(time.time()-t_ini)
 
     plt.subplot(1, 2, 1)
     plt.title("loss")
-    plt.plot(train_loss, 'b-')
-    plt.plot(val_loss, 'r-')
+    plt.plot(learning_rates, train_loss,  'b-')
+    plt.xscale('log')
+    plt.plot(learning_rates, val_loss,  'r-')
+    plt.xscale('log')
     plt.legend(["train", "val"])
     plt.subplot(1, 2, 2)
     plt.title("accuracy")
-    plt.plot(train_accuracy, 'b-')
-    plt.plot(val_accuracy, 'r-')
+    plt.plot(learning_rates, train_accuracy,  'b-')
+    plt.xscale('log')
+    plt.plot(learning_rates, val_accuracy,  'r-')
+    plt.xscale('log')
     plt.legend(["train", "val"])
-    display.clear_output(wait=True)
-    display.display(plt.gcf())
-    if epoch == range(epochs)[-1]:
-        plt.show()
+    #display.clear_output(wait=True)
+    #display.display(plt.gcf())
+    plt.show()
+    plt.plot(learning_rates, exe_time, 'g-')
+    plt.xscale('log')
+    plt.show()
+    # print("Temps d'execució total: ",time.time() - t_ini)
 
-        plt.figure()
-        ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True)
-        plt.show()
 
-display.clear_output(wait=True)
+def epochTest():
+
+    epochs_test = [5, 10, 25, 50, 75, 100]
+    train_loss = []
+    train_accuracy = []
+    val_loss = []
+    val_accuracy = []
+    exe_time = []
+
+    for epoch in epochs_test:
+        print("Training model with %s epochs..." % epoch)
+        t_ini = time.time()
+        optimizer = torch.optim.SGD(model.parameters(), learning_rate)
+
+        # Remove this line out of jupyter notebooks
+        for it in range(epoch):
+            t_loss, t_acc = train(model, optimizer, criterion)
+            v_loss, v_acc, confusionMatrix = val(model, criterion)
+            # print(confusionMatrix)
+
+            if it == range(epoch)[-1]:
+                train_loss.append(t_loss)
+                train_accuracy.append(t_acc)
+                val_loss.append(v_loss)
+                val_accuracy.append(v_acc)
+
+                plt.figure()
+                plt.title("Heatmap with %s epochs" % epoch)
+                ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True, fmt="d")
+                plt.show()
+
+        exe_time.append(time.time() - t_ini)
+
+    plt.subplot(1, 2, 1)
+    plt.title("loss")
+    plt.plot(epochs_test, train_loss, 'b-')
+    plt.xscale('log')
+    plt.plot(epochs_test, val_loss, 'r-')
+    plt.xscale('log')
+    plt.legend(["train", "val"])
+    plt.subplot(1, 2, 2)
+    plt.title("accuracy")
+    plt.plot(epochs_test, train_accuracy, 'b-')
+    plt.xscale('log')
+    plt.plot(epochs_test, val_accuracy, 'r-')
+    plt.xscale('log')
+    plt.legend(["train", "val"])
+    # display.clear_output(wait=True)
+    # display.display(plt.gcf())
+    plt.show()
+    plt.plot(epochs_test, exe_time, 'g-')
+    plt.xscale('log')
+    plt.show()
+    # print("Temps d'execució total: ",time.time() - t_ini)
+
+
+epochTest()
