@@ -6,6 +6,7 @@ import numpy as np
 import random
 from sklearn.metrics import confusion_matrix
 from IPython import display
+import seaborn as sb
 
 # Load datasets
 train_data = np.load('../base_dades_xarxes_neurals/train.npy', allow_pickle=True)
@@ -21,7 +22,7 @@ epochs = 25  # Number of iterations over the whole dataset.
 def select_class(data, clss):
     images = np.array(data.item()["images"])
     labels = np.array(data.item()["labels"])
-    labels = (labels == target_class).astype(int)
+    labels = (labels == target_class).astype(int)  # Binarització etiqueta 0 si != target, si 1 == target
     return images, labels
 
 
@@ -65,6 +66,7 @@ plt.title("Negative")
 plt.imshow(train_images[negative_indices[0], :, :], cmap="gray")
 """
 
+
 # Creació xarxa neuronal
 def init_weights(net):
     if type(net) == torch.nn.Module:
@@ -91,10 +93,10 @@ class NeuralNet(torch.nn.Module):
         x = torch.sigmoid(self.layer2(x))  # si dona error 'Cannot find reference 'sigmoid' in '__init__.py',
         # proveu x = func.sigmoid(self.layer1(x)), havent fet: import torch.nn.functional as func
 
-        ##=====Apartat B,C
+        # Apartat B,C
         return torch.sigmoid(self.output(x))  # Binary output
 
-        ##=====Apartat A
+        # Apartat A
         # return torch.nn.functional.log_softmax(self.output(x), dim=1)  # 10 classes neural network
 
 
@@ -224,18 +226,19 @@ for epoch in range(epochs):
     t_loss, t_acc = train(model, optimizer, criterion)
 
     v_loss, v_acc, confusionMatrix = val(model, criterion)
+    print(confusionMatrix)
 
     train_loss.append(t_loss)
     train_accuracy.append(t_acc)
     val_loss.append(v_loss)
     val_accuracy.append(v_acc)
 
-    plt.subplot(1,2,1)
+    plt.subplot(1, 2, 1)
     plt.title("loss")
     plt.plot(train_loss, 'b-')
     plt.plot(val_loss, 'r-')
     plt.legend(["train", "val"])
-    plt.subplot(1,2,2)
+    plt.subplot(1, 2, 2)
     plt.title("accuracy")
     plt.plot(train_accuracy, 'b-')
     plt.plot(val_accuracy, 'r-')
@@ -245,7 +248,8 @@ for epoch in range(epochs):
     if epoch == range(epochs)[-1]:
         plt.show()
 
-
+        plt.figure()
+        ax = sb.heatmap(confusionMatrix, cmap="Blues")
+        plt.show()
 
 display.clear_output(wait=True)
-
