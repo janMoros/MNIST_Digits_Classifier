@@ -16,7 +16,7 @@ val_data = np.load('../base_dades_xarxes_neurals/val.npy', allow_pickle=True)
 # Optimizaiton config
 target_class = 3  # Train a classifier for this class
 batch_size = 50  # Number of samples used to estimate the gradient (bigger = stable training & bigger learning rate)
-learning_rate = 0.1  # Optimizer learning rate
+learning_rate = 0.0005  # Optimizer learning rate
 epochs = 25  # Number of iterations over the whole dataset.
 
 

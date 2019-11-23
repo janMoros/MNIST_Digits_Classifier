@@ -93,3 +93,8 @@ Caldria confirmar la validesa de l'estudi anterior. En cas que fos valid, analit
 __ULTIM TEST PER SORTIR DE DUBTES AMB LR = 0.05__
 
 Genera més confusió doncs ens reafirma que el lr òptim és d'ordre menor. Aquests són els resultats:
+
+![](img/epochs/test4.png =300x)
+![](img/epochs/hmT4.png =250x)
+
+Tenim un overfitting de la hostia. Potser s'ha de filar encara més prim amb el learning rate.
