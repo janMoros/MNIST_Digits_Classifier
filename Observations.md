@@ -98,3 +98,63 @@ Genera més confusió doncs ens reafirma que el lr òptim és d'ordre menor. Aqu
 ![](img/epochs/hmT4.png =250x)
 
 Tenim un overfitting de la hostia. Potser s'ha de filar encara més prim amb el learning rate.
+
+### Decisió valor epochs i lr
+Per a seguir provant paràmetres es decideix establir un valor per epochs i lr. Amb lr = 0.001 i epochs = 25 obtenim aquest resultat:
+
+![](img/conclusions1/overfit.png =250x)
+
+Clarament el model arriba al overfitting després de 18-20 epochs, així que retallarem aquest valor.
+
+Tot i això ens adonem que el model en aquest cas termina amb un accuracy del 90%, però perque ho categoritza tot com a no target (problema de l'accuracy ja comentat).
+
+Redefinim valors: lr = 0.0005 i epochs = 50.
+
+![](img/conclusions1/overfit2.png =250x)
+
+Veiem com a partir de 41-42 epochs comença a tenir overfitting, retallem de nou. Realment necessitem 45 epochs.
+
+Obtenim aquests resultats:
+
+![](img/conclusions1/mod1.png =350x)
+
+Ja no tenim el problema del accuracy tot i que té valors força alts de confusió.
+
+### Update
+
+Vale, es una merda perque no funcionava amb tots els casos. Toca augmentar el lr a 0.01 i pujar considerablement el valor dels epochs per a tenir un model casi perfecte. Provem amb 500:
+
+![](img/conclusions1/mod2.png =250x)
+![](img/conclusions1/res2.png =250x)
+
+Realment s'estabilitza força als 250-300 però consumeix massa temps. Hem de trobar la manera d'optimitzar això.
+
+### Batch size
+Aqui es comença a veure la llum.
+Trets importants:
+* Contra més gran, entrena més rapid i equival a tenir un learning rate també més gran.
+* Al cas contrari, més lent però teòricament més precís.
+
+Per a diferents valors tenim els següents resultats:
+
+![](img/batch/res1.png =300x)
+
+Podem observar com per a majors valors del batch_size millors resultats. Realment no és ben bé així. El que està passant és que estem accelerant el procés. Teòricament hauriem d'arribar a resultats similars si modifiquem el batch_size sempre i quan li permetem realitzar els epochs corresponents. Ha estat entrenat amb 25 epochs, si ho fessim amb 200 per als valors més petits, hauriem de tenir un resultat similar a les mides més grans amb menys epochs d'entrenament.
+
+
+![](img/batch/time1.png =300x)
+
+A més podem veure com a mesura que augmentem el tamany, disminueix el temps d'execució. Això ens dona molt d'avantatge, amb valors grans:
+* Arribem a bons resultats abans
+* Podem augmentar els epochs d'entrenament per a millorar els resultats.
+
+Tot i això no convé posar el valor més alt possible.
+Considerem que un intermig entre 500 i 1000 és un bon valor.
+
+### Paràmetres fins a aquest punt
+* __Learning rate:__ 0.05
+* __Epochs:__ 250
+* __Batch Size:__ 750
+
+![](img/batch/resAct.png =250x)
+![](img/batch/hmAct.png =250x)

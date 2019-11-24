@@ -14,10 +14,10 @@ train_data = np.load('../base_dades_xarxes_neurals/train.npy', allow_pickle=True
 val_data = np.load('../base_dades_xarxes_neurals/val.npy', allow_pickle=True)
 
 # Optimizaiton config
-target_class = 3  # Train a classifier for this class
-batch_size = 50  # Number of samples used to estimate the gradient (bigger = stable training & bigger learning rate)
-learning_rate = 0.0005  # Optimizer learning rate
-epochs = 25  # Number of iterations over the whole dataset.
+target_class = 5  # Train a classifier for this class
+batch_size = 750  # Number of samples used to estimate the gradient (bigger = stable training & bigger learning rate)
+learning_rate = 0.05  # Optimizer learning rate
+epochs = 250  # Number of iterations over the whole dataset.
 
 
 def select_class(data, clss):
@@ -112,11 +112,12 @@ model.apply(init_weights)
 optimizer = torch.optim.SGD(model.parameters(), learning_rate)
 
 # Instantiate loss function
-criterion = torch.nn.BCELoss()  # Binary logistic regression
+#criterion = torch.nn.BCELoss()  # Binary logistic regression
+criterion = torch.nn.MSELoss()
 
 
 # Function to iterate the training set and update network weights with batches of images.
-def train(model, optimizer, criterion):
+def train(model, optimizer, criterion, batch_size=batch_size):
     model.train()  # training model
 
     running_loss = 0
@@ -159,6 +160,7 @@ def train(model, optimizer, criterion):
 
     epoch_loss = running_loss / total  # mean epoch loss
     epoch_acc = running_corrects / total  # mean epoch accuracy
+
 
     return epoch_loss, epoch_acc
 
@@ -369,4 +371,59 @@ def epochTest():
     # print("Temps d'execució total: ",time.time() - t_ini)
 
 
-epochTest()
+def batchTest():
+    batches = [10, 20, 50, 75, 100, 200, 500, 1000]
+    train_loss = []
+    train_accuracy = []
+    val_loss = []
+    val_accuracy = []
+    exe_time = []
+
+    for batch in batches:
+        t_ini = time.time()
+        optimizer = torch.optim.SGD(model.parameters(), learning_rate)
+
+        # Remove this line out of jupyter notebooks
+        for epoch in range(epochs):
+            t_loss, t_acc = train(model, optimizer, criterion, batch)
+            v_loss, v_acc, confusionMatrix = val(model, criterion)
+            # print(confusionMatrix)
+
+
+            if epoch == range(epochs)[-1]:
+                train_loss.append(t_loss)
+                train_accuracy.append(t_acc)
+                val_loss.append(v_loss)
+                val_accuracy.append(v_acc)
+
+                plt.figure()
+                plt.title("Heatmap with batch size %s" % batch)
+                ax = sb.heatmap(confusionMatrix, cmap="Blues", annot=True, fmt="d")
+                plt.show()
+
+        exe_time.append(time.time()-t_ini)
+
+    plt.subplot(1, 2, 1)
+    plt.title("loss")
+    plt.plot(batches, train_loss,  'b-')
+    plt.xscale('log')
+    plt.plot(batches, val_loss,  'r-')
+    plt.xscale('log')
+    plt.legend(["train", "val"])
+    plt.subplot(1, 2, 2)
+    plt.title("accuracy")
+    plt.plot(batches, train_accuracy,  'b-')
+    plt.xscale('log')
+    plt.plot(batches, val_accuracy,  'r-')
+    plt.xscale('log')
+    plt.legend(["train", "val"])
+    #display.clear_output(wait=True)
+    #display.display(plt.gcf())
+    plt.show()
+    plt.plot(batches, exe_time, 'g-')
+    plt.xscale('log')
+    plt.show()
+    # print("Temps d'execució total: ",time.time() - t_ini)
+
+
+entrenamentMain()
