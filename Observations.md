@@ -158,3 +158,20 @@ Considerem que un intermig entre 500 i 1000 és un bon valor.
 
 ![](img/batch/resAct.png =250x)
 ![](img/batch/hmAct.png =250x)
+
+### Creació de tots els classificadors binaris
+Per a poder fer això possible cal modificar moderadament el codi aportat. D'aquesta manera en comptes de calcular sols per un model, se'n genera una llista amb tantes posicions com classes hi ha. El resultat d'entrenar cada un dels models és el següent:
+
+![](img/classifiers/1.png =170x)
+![](img/classifiers/2.png =170x)
+![](img/classifiers/3.png =170x)
+
+![](img/classifiers/4.png =170x)
+![](img/classifiers/5.png =170x)
+![](img/classifiers/6.png =170x)
+
+![](img/classifiers/7.png =170x)
+![](img/classifiers/8.png =170x)
+![](img/classifiers/9.png =170x)
+
+Els resultats són molt similars entre models, per tant podem concloure que el model és igual de funcional per a tots els targets.
